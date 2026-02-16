@@ -1,36 +1,69 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('API Automation - JSONPlaceholder', () => {
-    const baseUrl = 'https://jsonplaceholder.typicode.com/posts';
-    const targetPostId = 1; 
+test.describe('API Automation Scenarios', () => {
 
-    test('CRUD Operations Flow', async ({ request }) => {
-        // 1. CREATE
-        const createResponse = await request.post(baseUrl, {
-            data: { title: 'foo', body: 'bar', userId: 1 },
+    // CRUD: POST
+    test('API_01: Create Resource (POST)', async ({ request }) => {
+        const response = await request.post('https://jsonplaceholder.typicode.com/posts', {
+            data: { title: 'QA Test', body: 'Automation', userId: 1 }
         });
-        expect(createResponse.ok()).toBeTruthy();
-        const createBody = await createResponse.json();
-        expect(createBody).toMatchObject({ title: 'foo', body: 'bar' });
+        expect(response.status()).toBe(201);
+        const body = await response.json();
+        expect(body.id).toBeTruthy();
+    });
 
-        // 2. READ
-        const getResponse = await request.get(`${baseUrl}/${targetPostId}`);
-        expect(getResponse.ok()).toBeTruthy();
-        const getBody = await getResponse.json();
-        expect(getBody.id).toBe(targetPostId);
+    // CRUD: GET
+    test('API_02: Read Resource (GET)', async ({ request }) => {
+        const response = await request.get('https://jsonplaceholder.typicode.com/posts/1');
+        expect(response.status()).toBe(200);
+        const body = await response.json();
+        expect(body.id).toBe(1);
+    });
 
-        // 3. UPDATE
-        const updateResponse = await request.put(`${baseUrl}/${targetPostId}`, {
-            data: { id: targetPostId, title: 'updated title', body: 'bar', userId: 1 },
+    // CRUD: PATCH (Partially Update)
+    test('API_03: Partial Update (PATCH)', async ({ request }) => {
+        // PATCH only updates specific fields (Title only)
+        const response = await request.patch('https://jsonplaceholder.typicode.com/posts/1', {
+            data: { title: 'UPDATED TITLE ONLY' }
         });
-        expect(updateResponse.ok()).toBeTruthy();
-        const updateBody = await updateResponse.json();
+        expect(response.status()).toBe(200);
+        const body = await response.json();
         
-        // 4. VERIFY UPDATE
-        expect(updateBody.title).toBe('updated title'); 
+        expect(body.title).toBe('UPDATED TITLE ONLY');
+        // Verify other fields exist and were NOT deleted (unlike PUT)
+        expect(body.body).toBeTruthy(); 
+    });
 
-        // 5. DELETE
-        const deleteResponse = await request.delete(`${baseUrl}/${targetPostId}`);
-        expect(deleteResponse.ok()).toBeTruthy();
+    // CRUD: DELETE
+    test('API_04: Delete Resource', async ({ request }) => {
+        const response = await request.delete('https://jsonplaceholder.typicode.com/posts/1');
+        expect(response.status()).toBe(200);
+    });
+
+    // NEGATIVE: GET Non-Existent ID
+    test('API_05: Negative Get (404)', async ({ request }) => {
+        const response = await request.get('https://jsonplaceholder.typicode.com/posts/9999');
+        expect(response.status()).toBe(404);
+    });
+
+    // EDGE: Invalid Payload Types
+    test('API_06: Edge Case (Invalid Payload)', async ({ request }) => {
+        // Sending a number as 'title' and boolean as 'body' to test API robustness
+        const response = await request.post('https://jsonplaceholder.typicode.com/posts', {
+            data: { 
+                title: 12345, 
+                body: true, 
+                userId: 'invalid_string' 
+            }
+        });
+        
+        // JSONPlaceholder is robust and will likely accept it (201) or ignore bad fields.
+        // We assert that the API handles it gracefully without crashing (500 error).
+        expect(response.status()).toBe(201);
+        
+        const body = await response.json();
+        // Verify it didn't crash and returned an ID
+        expect(body.id).toBeTruthy();
+        console.log('API handled invalid types gracefully:', body);
     });
 });

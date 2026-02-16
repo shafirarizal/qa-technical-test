@@ -37,3 +37,6 @@ This repository contains automated tests for Web UI (Swag Labs) and API (JSONPla
 | **CRUD** | `DELETE` | Delete the post and verify 200 OK status. |
 | **Negative** | `GET` | Attempt to fetch a non-existent ID (e.g., `9999`) and verify `404 Not Found`. |
 | **Edge** | `POST` | Send invalid payload types (boolean/numbers) to test API robustness. |
+
+## CI/CD Status
+This project uses GitHub Actions to run the full suite of 11 tests in a clean Ubuntu environment. This ensures code quality and state validation before any merge.

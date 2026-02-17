@@ -39,4 +39,5 @@ This repository contains automated tests for Web UI (Swag Labs) and API (JSONPla
 | **Edge** | `POST` | Send invalid payload types (boolean/numbers) to test API robustness. |
 
 ## CI/CD Status
-This project uses GitHub Actions to run the full suite of 11 tests in a clean Ubuntu environment. This ensures code quality and state validation before any merge.
+This project uses GitHub Actions to run the full suite of 11 tests in a clean Ubuntu environment. This ensures code quality and state validation before any merge. 
+

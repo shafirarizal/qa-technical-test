@@ -54,7 +54,7 @@ test.describe('API Automation Scenarios', () => {
             }
         });
         
-        // Asserting that the API handles invalid types gracefully without a 500 Internal Server Error
+        // Asserting that the API handles invalid types gracefully without 500 Internal Server Error
         expect(response.status()).toBe(201);
         const body = await response.json();
         expect(body.id).toBeDefined(); 

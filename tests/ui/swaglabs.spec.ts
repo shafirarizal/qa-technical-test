@@ -21,7 +21,7 @@ test.describe('Web UI Automation Scenarios', () => {
         await inventoryPage.addItemToCart();
         await inventoryPage.goToCart();
         
-        // --- FIX IS HERE: Click Checkout Button ---
+        // Click Checkout Button 
         await page.locator('[data-test="checkout"]').click();
         // ------------------------------------------
 
